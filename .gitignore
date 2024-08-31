@@ -1,0 +1,29 @@
+tags
+/Assets/Adaptive Performance/
+/Assets/Adaptive Performance.meta
+/Assets/StreamingAssets/
+/Assets/StreamingAssets.meta
+
+Builds
+Logs
+Library
+obj
+Temp
+UserSettings
+
+#My Key
+*.keystore
+
+.vscode
+.vs
+.DS_Store
+.idea
+*DotSettings*
+*.sln
+*.csproj
+
+mono_crash*
+Glyph Report*
+
+#Unity Test Framework Test Scenes
+InitTestScene*.*
