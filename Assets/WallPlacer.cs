@@ -17,13 +17,17 @@ class WallPlacer : MonoBehaviour
     [SerializeField] Vector2 _test;
 
     void Update() {
+        if (Input.GetKeyDown(KeyCode.Space)) {
+            var euler = _wallGhost.rotation.eulerAngles;
+            euler.y += 90f;
+            _wallGhost.rotation = Quaternion.Euler(euler);
+        }
         if (Input.GetMouseButtonUp(1)) {
             if (_didHit && _hit.point.z > 0f) {
                 var x = (int)_hit.point.x;
                 var y = (int)_hit.point.z;
                 Main.Instance.OnWallPlace(new(x, y), _wallGhost.rotation);
             }
-            ResetWallGhost();
         }
         if (!Input.GetMouseButton(1)) {
             _wallGhost.position = _wallGhostPos;
@@ -42,9 +46,6 @@ class WallPlacer : MonoBehaviour
 
     void ResetWallGhost() {
         _wallGhost.position = _wallGhostPos;
-        var euler = _wallGhost.rotation.eulerAngles;
-        euler.y += 90f;
-        _wallGhost.rotation = Quaternion.Euler(euler);
     }
 }
 
