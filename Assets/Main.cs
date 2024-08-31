@@ -5,10 +5,12 @@ using static WallOrientation;
 using static Direction;
 
 class Player {
-    public int WallsRemaining = 10;
+    const int WALL_MAX = 10;
     public Transform Transform;
     public GameObject MyTurn;
     public int WinY;
+
+    public Queue<GameObject> WallInstances = new();
 
     public Vector3 position {
         get => Transform.position;
@@ -16,7 +18,7 @@ class Player {
     }
 
     public Vector2Int BoardPos() {
-        return new Vector2Int((int)Transform.position.x, (int)Transform.position.z);;
+        return new Vector2Int((int)Transform.position.x, (int)Transform.position.z);
     }
 
     public static Player New(Vector2Int pos, GameObject prefab, Material mat = null) {
@@ -31,6 +33,19 @@ class Player {
             player.Transform.GetComponent<MeshRenderer>().material = mat;
         player.MyTurn = player.Transform.GetChild(0).gameObject;
         player.MyTurn.SetActive(false);
+
+        var wallX = pos.y switch {
+            0 => 10f,
+            8 => -2f,
+            _ => throw new(),
+        };
+        var wallPos = new Vector3(wallX, 0f, -0.5f);
+        for (int i = 0; i < WALL_MAX; ++i) {
+            var wall = GameObject.Instantiate(Main.Instance._wallPrefab, wallPos, Quaternion.identity);
+            player.WallInstances.Enqueue(wall.gameObject);
+            wallPos.z += 1f;
+        }
+
         return player;
     }
 }
@@ -41,6 +56,7 @@ class Main : Singleton<Main>
     [SerializeField] GameObject _playerPrefab;
     [SerializeField] Material _p2mat;
     [SerializeField] TMP_Text _winText;
+    [SerializeField] public Transform _wallPrefab;
 
     Player _player1;
     Player _player2;
@@ -242,8 +258,8 @@ class Main : Singleton<Main>
         ElapseTurn();
     }
 
-    public void OnWallPlace(RaycastHit hit, Transform prefab, Quaternion rotation) {
-        if (_currentPlayer.WallsRemaining <= 0) {
+    public void OnWallPlace(Vector2Int pos, Quaternion rotation) {
+        if (_currentPlayer.WallInstances.Count <= 0) {
             print("no walls remaining!");
             return;
         }
@@ -259,8 +275,8 @@ class Main : Singleton<Main>
             V => H,
             _ => throw new()
         };
-        var x = (int)hit.point.x;
-        var y = (int)hit.point.z;
+        var x = pos.x;
+        var y = pos.y;
 
         if (_walls.Contains(new(x, y, other_rot)))
             return;
@@ -280,30 +296,21 @@ class Main : Singleton<Main>
             throw new();
         }
 
-
-        if (hit.point.z < 0f)
-            return;
         if (x >= 8 || y >= 8)
             return;
 
         var newWall = new Wall(x, y, ori);
         _walls.Add(newWall);
-        if (!DFS(_opponentPlayer.BoardPos(), _opponentPlayer.WinY)) {
-            print("dfs fail!");
-            _walls.Remove(newWall);
-            return;
-        }
-        if (!DFS(_currentPlayer.BoardPos(), _currentPlayer.WinY)) {
+        if (!DFS(_opponentPlayer) || !DFS(_currentPlayer)) {
             print("dfs fail!");
             _walls.Remove(newWall);
             return;
         }
 
-        Instantiate(prefab, new(x + 0.5f, 0.5f, y + 0.5f), rotation);
+        Instantiate(_wallPrefab, new(x + 0.5f, 0.5f, y + 0.5f), rotation);
         print($"new wall: {x}, {y}, {ori}");
 
-        _currentPlayer.WallsRemaining -= 1;
-        print(_currentPlayer.WallsRemaining);
+        _currentPlayer.WallInstances.Dequeue().SetActive(false);
 
         ElapseTurn();
     }
@@ -318,7 +325,9 @@ class Main : Singleton<Main>
     HashSet<Vector2Int> _visited = new();
     Stack<Vector2Int> _queue = new();
 
-    bool DFS(Vector2Int start, int endY) {
+    bool DFS(Player player) {
+        var start = player.BoardPos();
+        var endY = player.WinY;
         print("endY: " +endY);
 
         _visited.Clear();

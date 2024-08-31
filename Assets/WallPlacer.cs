@@ -3,7 +3,6 @@ using UnityEngine;
 class WallPlacer : MonoBehaviour
 {
     [SerializeField] Transform _wallGhost;
-    [SerializeField] Transform _wallPrefab;
 
     Vector3 _wallGhostPos;
     Camera _cam;
@@ -19,8 +18,10 @@ class WallPlacer : MonoBehaviour
 
     void Update() {
         if (Input.GetMouseButtonUp(1)) {
-            if (_didHit) {
-                Main.Instance.OnWallPlace(_hit, _wallPrefab, _wallGhost.rotation);
+            if (_didHit && _hit.point.z > 0f) {
+                var x = (int)_hit.point.x;
+                var y = (int)_hit.point.z;
+                Main.Instance.OnWallPlace(new(x, y), _wallGhost.rotation);
             }
             ResetWallGhost();
         }
@@ -34,11 +35,6 @@ class WallPlacer : MonoBehaviour
         _didHit = Physics.Raycast(ray, out _hit);
         if (_didHit) {
             _wallGhost.position = _hit.point;
-            { //TODO test codes
-            var x = (int)_hit.point.x;
-            var y = (int)_hit.point.z;
-            _test = new(x, y);
-            }
         } else {
             _wallGhost.position = _wallGhostPos;
         }

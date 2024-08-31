@@ -157,6 +157,7 @@ MonoBehaviour:
   _playerPrefab: {fileID: 6574221106452081295, guid: 0257a4b75a5b6441f9b8ad1e6d7bbbe9, type: 3}
   _p2mat: {fileID: 2100000, guid: bcdf8de453ee04cbeb8c2e5952500ab6, type: 2}
   _winText: {fileID: 445934616}
+  _wallPrefab: {fileID: 7453632610147748937, guid: e34821a7f4ed84f5384950d67d361d5a, type: 3}
 --- !u!4 &198548917
 Transform:
   m_ObjectHideFlags: 0
@@ -185,7 +186,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _wallGhost: {fileID: 1176913219}
-  _wallPrefab: {fileID: 7453632610147748937, guid: e34821a7f4ed84f5384950d67d361d5a, type: 3}
   _test: {x: 0, y: 0}
 --- !u!1 &445934614
 GameObject:
@@ -425,7 +425,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0.3018868, g: 0.29629117, b: 0.26913494, a: 0}
+  m_BackGroundColor: {r: 0.277, g: 0.26470813, b: 0.17866501, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -475,7 +475,7 @@ Transform:
   m_GameObject: {fileID: 519420028}
   serializedVersion: 2
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 4, y: 10, z: 4}
+  m_LocalPosition: {x: 4, y: 9, z: 4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
