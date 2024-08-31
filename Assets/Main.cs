@@ -286,17 +286,20 @@ class Main : Singleton<Main>
         if (x >= 8 || y >= 8)
             return;
 
-        if (!BFS(_opponentPlayer.BoardPos(), _opponentPlayer.WinY)) {
-            print("bfs fail!");
+        var newWall = new Wall(x, y, ori);
+        _walls.Add(newWall);
+        if (!DFS(_opponentPlayer.BoardPos(), _opponentPlayer.WinY)) {
+            print("dfs fail!");
+            _walls.Remove(newWall);
             return;
         }
-        if (!BFS(_currentPlayer.BoardPos(), _currentPlayer.WinY)) {
-            print("bfs fail!");
+        if (!DFS(_currentPlayer.BoardPos(), _currentPlayer.WinY)) {
+            print("dfs fail!");
+            _walls.Remove(newWall);
             return;
         }
 
         Instantiate(prefab, new(x + 0.5f, 0.5f, y + 0.5f), rotation);
-        _walls.Add(new(x, y, ori));
         print($"new wall: {x}, {y}, {ori}");
 
         _currentPlayer.WallsRemaining -= 1;
@@ -312,21 +315,24 @@ class Main : Singleton<Main>
         _opponentPlayer.MyTurn.SetActive(false);
     }
 
-    bool BFS(Vector2Int start, int endY) {
+    HashSet<Vector2Int> _visited = new();
+    Stack<Vector2Int> _queue = new();
+
+    bool DFS(Vector2Int start, int endY) {
         print("endY: " +endY);
-        var _visited = new HashSet<Vector2Int>();
-        var _queue = new Queue<Vector2Int>();
+
+        _visited.Clear();
+        _queue.Clear();
 
         _visited.Add(start);
-        _queue.Enqueue(start);
+        _queue.Push(start);
         int tmp_counter = 0;
 
         while (_queue.Count > 0) {
-            var cur = _queue.Dequeue();
-            // print($"{tmp_counter}: {cur}");
+            var cur = _queue.Pop();
             ++tmp_counter;
             if (cur.y == endY) {
-                print(cur + "bfs end!");
+                print(cur + $"dfs end! ({tmp_counter})");
                 return true;
             }
 
@@ -336,8 +342,7 @@ class Main : Singleton<Main>
                     if (!target.IsValid())
                         continue;
                     if (CanMoveTo(cur, d)) {
-                        print($"{tmp_counter}: {cur}, {d}");
-                        _queue.Enqueue(target);
+                        _queue.Push(target);
                         _visited.Add(cur);
                     }
                 }
@@ -347,7 +352,7 @@ class Main : Singleton<Main>
     }
 
     readonly List<Direction> _directions = new() {
-        Up, Down, Left, Right
+        Up, Left, Down, Right
     };
 }
 
