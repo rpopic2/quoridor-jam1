@@ -15,6 +15,7 @@ class WallPlacer : MonoBehaviour
 
     bool _didHit;
     RaycastHit _hit;
+    [SerializeField] Vector2 _test;
 
     void Update() {
         if (Input.GetMouseButtonUp(1)) {
@@ -33,6 +34,11 @@ class WallPlacer : MonoBehaviour
         _didHit = Physics.Raycast(ray, out _hit);
         if (_didHit) {
             _wallGhost.position = _hit.point;
+            { //TODO test codes
+            var x = (int)_hit.point.x;
+            var y = (int)_hit.point.z;
+            _test = new(x, y);
+            }
         } else {
             _wallGhost.position = _wallGhostPos;
         }
